@@ -15,24 +15,35 @@ const client = new Client({
   node: process.env.ELASTIC_SEARCH_URI
 })
 
-app.use(cors(corsOptions))
+app.use(cors())
+app.use(express.json()) // for parsing application/json
+app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
+
 
 app.options('*', cors(corsOptions))
 
 app.get('/', cors(corsOptions), async (req, res) => {
+  res.status(200).send('OK');
+})
 
-  const searchTerm = req.query.searchTerm
+app.post('/', cors(corsOptions), async (req, res) => {
+
+try {
+  const searchTerm = req.body.searchTerm
+  const highlight = req.body.highlight ? req.body.highlight : {
+    fields: {
+      text: {}
+    },
+    boundary_chars:".,!? \t\n།",
+    fragment_size: 70
+  };
 
   console.log("searchTerm="+searchTerm)
+  console.log("highlight="+JSON.stringify(highlight))
 
   const result = await client.search({
     index: INDEX,
-    highlight: {
-      "fields": {
-        "text": {}
-      },
-      boundary_chars:".,!? \t\n།་"
-    },
+    highlight: highlight,
     query: {
       match: {
         text: searchTerm
@@ -40,7 +51,14 @@ app.get('/', cors(corsOptions), async (req, res) => {
     }
   })
 
+  //console.log("RESULT=:"+JSON.stringify(result,null,2))
+
   res.send({ result: result, searchTerm:searchTerm })
+}
+catch (e){
+  console.error(e)
+  res.status(500).send("ERROR: " + e)
+}
 })
 
 app.listen(port, () => {
