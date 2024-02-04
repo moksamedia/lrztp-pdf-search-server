@@ -28,37 +28,68 @@ app.get('/', cors(corsOptions), async (req, res) => {
 
 app.post('/', cors(corsOptions), async (req, res) => {
 
-try {
-  const searchTerm = req.body.searchTerm
-  const highlight = req.body.highlight ? req.body.highlight : {
-    fields: {
-      text: {}
-    },
-    boundary_chars:".,!? \t\n།",
-    fragment_size: 70
-  };
+  try {
+    const searchTerm = req.body.searchTerm
+    const highlight = req.body.highlight ? req.body.highlight : {
+      fields: {
+        text: {}
+      },
+      boundary_chars:".,!? \t\n།",
+      fragment_size: 70
+    };
 
-  console.log("searchTerm="+searchTerm)
-  console.log("highlight="+JSON.stringify(highlight))
+    console.log("searchTerm="+searchTerm)
+    console.log("highlight="+JSON.stringify(highlight))
 
-  const result = await client.search({
-    index: INDEX,
-    highlight: highlight,
-    query: {
-      match: {
-        text: searchTerm
+    const result = await client.search({
+      index: INDEX,
+      highlight: highlight,
+      query: {
+        match_phrase: {
+          text: searchTerm
+        }
       }
+    })
+
+    //console.log("RESULT=:"+JSON.stringify(result,null,2))
+
+    res.send({ result: result, searchTerm:searchTerm })
+  }
+  catch (e){
+    console.error(e)
+    res.status(500).send("ERROR: " + e)
+  }
+})
+
+app.post('/colloquial', cors(corsOptions), async (req, res) => {
+
+  try {
+    const query = req.body.query
+    const size = req.body.size
+    const highlight = req.body.highlight;
+
+    console.log("query="+JSON.stringify(query))
+    console.log("highlight="+JSON.stringify(highlight))
+
+    const params = {
+      index: 'all_colloquial_dicts',
+      highlight: highlight,
+      query: query,
+      size: size
     }
-  })
 
-  //console.log("RESULT=:"+JSON.stringify(result,null,2))
+    console.log(params)
 
-  res.send({ result: result, searchTerm:searchTerm })
-}
-catch (e){
-  console.error(e)
-  res.status(500).send("ERROR: " + e)
-}
+    const result = await client.search(params)
+
+    //console.log("RESULT=:"+JSON.stringify(result,null,2))
+
+    res.send({ result: result })
+  }
+  catch (e){
+    console.error(e)
+    res.status(500).send("ERROR: " + e)
+  }
 })
 
 app.listen(port, () => {
