@@ -29,31 +29,16 @@ app.get('/', cors(corsOptions), async (req, res) => {
 app.post('/', cors(corsOptions), async (req, res) => {
 
   try {
-    const searchTerm = req.body.searchTerm
-    const highlight = req.body.highlight ? req.body.highlight : {
-      fields: {
-        text: {}
-      },
-      boundary_chars:".,!? \t\n།",
-      fragment_size: 70
-    };
 
-    console.log("searchTerm="+searchTerm)
-    console.log("highlight="+JSON.stringify(highlight))
+    const query = req.body.query
 
-    const result = await client.search({
-      index: INDEX,
-      highlight: highlight,
-      query: {
-        match_phrase: {
-          text: searchTerm
-        }
-      }
-    })
+    console.log("query="+JSON.stringify(query, null, 2))
+
+    const result = await client.search(query)
 
     //console.log("RESULT=:"+JSON.stringify(result,null,2))
 
-    res.send({ result: result, searchTerm:searchTerm })
+    res.send({ result: result })
   }
   catch (e){
     console.error(e)
@@ -66,16 +51,21 @@ app.post('/colloquial', cors(corsOptions), async (req, res) => {
   try {
     const query = req.body.query
     const size = req.body.size
+    const from = req.body.from
     const highlight = req.body.highlight;
+    const index = req.body.index;
 
+    console.log("index="+index)
     console.log("query="+JSON.stringify(query))
     console.log("highlight="+JSON.stringify(highlight))
+    console.log(`from=${from}, size=${size}`)
 
     const params = {
-      index: 'all_colloquial_dicts',
+      index: index,
       highlight: highlight,
       query: query,
-      size: size
+      size: size,
+      from: from
     }
 
     console.log(params)
