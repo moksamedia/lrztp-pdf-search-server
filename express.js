@@ -26,6 +26,22 @@ app.get('/', cors(corsOptions), async (req, res) => {
   res.status(200).send('OK');
 })
 
+app.get('/elasticsearch-health', cors(corsOptions), async (req, res) => {
+
+  try {
+
+    const result = await client.healthReport()
+
+    console.log("HEALTH RESULT=:"+JSON.stringify(result,null,2))
+
+    res.send({ result: result })
+  }
+  catch (e){
+    console.error(e)
+    res.status(500).send("ERROR: " + e)
+  }
+})
+
 app.post('/', cors(corsOptions), async (req, res) => {
 
   try {

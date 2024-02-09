@@ -33,6 +33,7 @@ services:
       - bootstrap.memory_lock=true
       - xpack.security.enabled=false
       - ingest.geoip.downloader.enabled=false
+      - network.host=0.0.0.0
     mem_limit: ${ES_MEM_LIMIT}
     ulimits:
       memlock:
