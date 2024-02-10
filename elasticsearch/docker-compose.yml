@@ -36,7 +36,7 @@ services:
 #      - index.number_of_shards=1
 #      - index.number_of_replicas=0
       - network.host=0.0.0.0
-      - ES_JAVA_OPTS="-Xms750mb -Xmx750mb"
+#      - ES_JAVA_OPTS="-Xms750mb -Xmx750mb"
     mem_limit: ${ES_MEM_LIMIT}
     ulimits:
       memlock:

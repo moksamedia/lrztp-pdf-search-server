@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 var cors = require('cors')
 const app = express()
-const port = process.env.SERVER_PORT | 3000
+const port = process.env.SERVER_PORT || 3000
 
 let corsOptions = {
   origin: ['http://127.0.0.1:5173','http://localhost:5173','http://localhost:5173/'],
@@ -18,7 +18,7 @@ const client = new Client({
 app.use(cors())
 app.use(express.json()) // for parsing application/json
 app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
-
+app.use(express.static('static'))
 
 app.options('*', cors(corsOptions))
 
